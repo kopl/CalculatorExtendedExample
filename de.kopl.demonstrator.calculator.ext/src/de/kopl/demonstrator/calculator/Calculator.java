@@ -1,5 +1,8 @@
 package de.kopl.demonstrator.calculator;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.MouseEvent;
@@ -7,7 +10,6 @@ import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseTrackListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -20,129 +22,37 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 
+import de.kopl.demonstrator.calculator.commands.*;
+
 public class Calculator {
-
-	/*
-	 * Initialize variables needed for this class.
-	 */
-	private Label displayText;
-
-	private CalculatorEngine calculatorEngine;
-
-	private Label statusText;
-
-	private StyledText historyView;
-
-	private Label memoryLabel;
 
 	public static void main(String[] a) {
 		Calculator calculator = new Calculator();
 		calculator.open();
 	}
 
-	private void open() {
-		Display display = new Display();
-		Shell shell = new Shell(display, SWT.TITLE | SWT.CLOSE);
+	private CalculatorEngine calculatorEngine;
 
-		createContents(shell);
+	/*
+	 * Initialize variables needed for this class.
+	 */
+	private Label displayText;
 
-		shell.pack();
-		shell.open();
-		while (!shell.isDisposed()) {
-			if (!display.readAndDispatch()) {
-				display.sleep();
-			}
-		}
-		display.dispose();
-	}
+	private Label memoryLabel;
+
+	private StyledText historyView;
+
+	private StyleProvider styleProvider;
+
+	private Label statusText;
+
+	private Shell shell;
+
+	private List<Control> buttons = new ArrayList<Control>();
 
 	public Calculator() {
 		this.calculatorEngine = new CalculatorEngine(this);
-	}
-
-	protected Control createContents(final Shell container) {
-
-		container.setBackground(getSystemColor(SWT.COLOR_BLACK));
-		container.setForeground(getSystemColor(SWT.COLOR_BLACK));
-
-		
-		addMainMenu(container);
-		initUiGrid(container);
-		
-		initCalculatorDisplay(container);
-		addMemoryLabel(container);
-		addCalculatorButtons(container);
-		addSeparator(container);
-		addHistoryView(container);
-		addStatusBar(container);
-
-		return container;
-	}
-
-	private void addHistoryView(Composite container) {
-		historyView = new StyledText(container, SWT.MULTI | SWT.WRAP | SWT.READ_ONLY);
-	
-		historyView.setBackground(getSystemColor(SWT.COLOR_RED));
-		historyView.setForeground(getSystemColor(SWT.COLOR_YELLOW));
-
-		Caret caret = new Caret(historyView, SWT.NONE);
-		historyView.setCaret(caret);
-
-		GridData layoutData = new GridData(SWT.FILL, SWT.TOP, true, false, 5, 1);
-		layoutData.heightHint = 200;
-		historyView.setEditable(false);
-		historyView.setLayoutData(layoutData);
-	}
-
-	public void appendHistoryEntry(String toAppend) {
-		historyView.append(toAppend);
-	}
-
-	private void addStatusBar(Composite container) {
-		registerToolTips(container);
-		statusText = new Label(container, SWT.RIGHT | SWT.NONE);
-		statusText.setText("");
-		statusText.setForeground(getSystemColor(SWT.COLOR_WHITE));
-		statusText.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false, 5, 1));
-	}
-
-	private void registerToolTips(Composite container) {
-		Control[] children = container.getChildren();
-		for (int i = 0; i < children.length; i++) {
-			Control child = children[i];
-			if (child instanceof Label) {
-				final Label component = (Label) child;
-				if (component.getToolTipText() == null) {
-					continue;
-				}
-				component.addMouseTrackListener(new MouseTrackListener() {
-
-					@Override
-					public void mouseHover(MouseEvent e) {
-						// do nothing
-					}
-
-					@Override
-					public void mouseExit(MouseEvent e) {
-						statusText.setText("");
-					}
-
-					@Override
-					public void mouseEnter(MouseEvent e) {
-						statusText.setText("[" + component.getText() + "] " + component.getToolTipText());
-					}
-				});
-			}
-		}
-	}
-
-	private void addEmptyPlaceholder(Composite container) {
-		new Label(container, SWT.NONE);
-	}
-
-	private void addSeparator(Composite container) {
-		Label separator = new Label(container, SWT.HORIZONTAL | SWT.SEPARATOR);
-		separator.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false, 5, 1));
+		this.styleProvider = new StyleProvider();
 	}
 
 	private void addCalculatorButtons(Composite container) {
@@ -152,231 +62,40 @@ public class Calculator {
 		addNumPadButtons(container);
 	}
 
-	private void addNumPadButtons(Composite container) {
-		add7Button(container);
-		add8Button(container);
-		add9Button(container);
-		addMultiplyButton(container);
-		addDivideButton(container);
-
-		add4Button(container);
-		add5Button(container);
-		add6Button(container);
-		addAddButton(container);
-		addSubstractButton(container);
-
-		add1Button(container);
-		add2Button(container);
-		add3Button(container);
-		addEmptyPlaceholder(container);
-		addEqualsButton(container);
-
-		add0Button(container);
-		addFloatingPointButton(container);
-		addSignButton(container);
-	}
-
-	private void addSignButton(Composite container) {
-		createCalculatorButton(container, Commands.CHANGE_SIGN, "+/-", "Change sign of value");
-	}
-
-	private void addFloatingPointButton(Composite container) {
-		createCalculatorButton(container, Commands.DECIMAL_POINT, ".", "Decimal Point");
-	}
-
-	private void add0Button(Composite container) {
-		createCalculatorButton(container, Commands.ZERO, "0", "Numeric Pad");
-	}
-
-	private void addEqualsButton(Composite container) {
-		Label equalsButton = createCalculatorButton(container, Commands.EQUALS, "=", "Equals (get result)");
-		equalsButton.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 1, 2));
-	}
-
-	private void add3Button(Composite container) {
-		createCalculatorButton(container, Commands.THREE, "3", "Numeric Pad");
-	}
-
-	private void add2Button(Composite container) {
-		createCalculatorButton(container, Commands.TWO, "2", "Numeric Pad");
-	}
-
-	private void add1Button(Composite container) {
-		createCalculatorButton(container, Commands.ONE, "1", "Numeric Pad");
-	}
-
-	private void addAddButton(Composite container) {
-		createCalculatorButton(container, Commands.ADDITION, "+", "Addition");
-	}
-
-	private void add6Button(Composite container) {
-		createCalculatorButton(container, Commands.SIX, "6", "Numeric Pad");
-	}
-
-	private void add5Button(Composite container) {
-		createCalculatorButton(container, Commands.FIVE, "5", "Numeric Pad");
-	}
-
-	private void add4Button(Composite container) {
-		createCalculatorButton(container, Commands.FOUR, "4", "Numeric Pad");
-	}
-
-	private void addSubstractButton(Composite container) {
-		createCalculatorButton(container, Commands.SUBTRACTION, "-", "Substraction");
-	}
-
-	private void add9Button(Composite container) {
-		createCalculatorButton(container, Commands.NINE, "9", "Numeric Pad");
-	}
-
-	private void add8Button(Composite container) {
-		createCalculatorButton(container, Commands.EIGHT, "8", "Numeric Pad");
-	}
-
-	private void add7Button(Composite container) {
-		createCalculatorButton(container, Commands.SEVEN, "7", "Numeric Pad");
-	}
-
-	private void addMultiplyButton(Composite container) {
-		createCalculatorButton(container, Commands.MULTIPLICATION, "*", "Multiplication");
-	}
-
 	private void addAdvancedMathButtons(Composite container) {
-		addInverseButton(container);
-		addSqrtButton(container);
-		addSinusButton(container);
-		addCosinusButton(container);
-		addTangensButton(container);
+		createCalculatorButton(container, new Inverse("1/x", "Inverse of value"));
+		createCalculatorButton(container, new SquareRoot("√", "Square root of value"));
+		createCalculatorButton(container, new Sinus("sin", "Sinus of value"));
+		createCalculatorButton(container, new Cosinus("cos", "Cosinus of value"));
+		createCalculatorButton(container, new Tangens("tan", "Tangens of value"));
 		addSeparator(container);
-	}
-
-	private void addSqrtButton(Composite container) {
-		createCalculatorButton(container, Commands.SQUARE_ROOT, "√", "Square root of value");
-	}
-
-	private void addInverseButton(Composite container) {
-		createCalculatorButton(container, Commands.INVERSE, "1/x", "Inverse of value");
-	}
-
-	private void addSinusButton(Composite container) {
-		createCalculatorButton(container, Commands.SINUS, "sin", "Sinus of value");
-	}
-
-	private void addCosinusButton(Composite container) {
-		createCalculatorButton(container, Commands.COSINUS, "cos", "Cosinus of value");
-	}
-
-	private void addTangensButton(Composite container) {
-		createCalculatorButton(container, Commands.TANGENS, "tan", "Tangens of value");
-	}
-
-	
-	private void addDivideButton(Composite container) {
-		createCalculatorButton(container, Commands.DIVISION, "/", "Division");
 	}
 
 	private void addClearingButtons(Composite container) {
 		addEmptyPlaceholder(container);
 		addEmptyPlaceholder(container);
-		addClearEntryButton(container);
-		addBackButton(container);
-		addClearAllButton(container);
+
+		createCalculatorButton(container, new ClearEntry("CE", "Clear Entry"));
+		createCalculatorButton(container, new BackSpace("←", "Backspace"));
+		createCalculatorButton(container, new Clear("C", "Clear All"));
+
 		addSeparator(container);
 	}
 
-	private void addMemoryLabel(Composite container) {
-		memoryLabel = new Label(container, SWT.LEFT | SWT.NONE);
-		memoryLabel.setBackground(getSystemColor(SWT.COLOR_BLACK));
-		memoryLabel.setForeground(getSystemColor(SWT.COLOR_BLUE));
-		
-		memoryLabel.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false, 5, 1));
-		updateMemoryLabel("");
+	private void addEmptyPlaceholder(Composite container) {
+		new Label(container, SWT.NONE);
 	}
 
-	public void updateMemoryLabel(String memory) {
-		memoryLabel.setText("M: " + memory);
-	}
+	private void addHistoryView(Composite container) {
+		historyView = new StyledText(container, SWT.MULTI | SWT.WRAP | SWT.READ_ONLY);
 
-	private void addBackButton(Composite container) {
-		createCalculatorButton(container, Commands.BACKSPACE, "←", "Backspace");
-	}
+		Caret caret = new Caret(historyView, SWT.NONE);
+		historyView.setCaret(caret);
 
-	private Label createCalculatorButton(Composite container, final Commands backspace, String buttonLabel,
-			String buttonToolTip) {
-		Label button = new Label(container, SWT.NONE | SWT.FLAT | SWT.CENTER);
-		button.setBackground(getSystemColor(SWT.COLOR_DARK_GRAY));
-		button.setForeground(getSystemColor(SWT.COLOR_WHITE));
-		
-		Font font = new Font(Display.getCurrent(), "Arial", 14, SWT.NONE);
-		button.setFont(font);
-
-		GridData buttonLayoutData = new GridData(SWT.FILL, SWT.FILL, true, true);
-		buttonLayoutData.widthHint = 40;
-		buttonLayoutData.heightHint = 30;
-		buttonLayoutData.verticalAlignment = GridData.VERTICAL_ALIGN_CENTER;
-		button.setLayoutData(buttonLayoutData);
-		button.setToolTipText(buttonToolTip);
-		button.setText(buttonLabel);
-
-		button.addMouseListener(new MouseListener() {
-
-			@Override
-			public void mouseUp(MouseEvent e) {
-				calculatorEngine.evaluateCommand(backspace);
-			}
-
-			@Override
-			public void mouseDown(MouseEvent e) {
-				// do nothing
-			}
-
-			@Override
-			public void mouseDoubleClick(MouseEvent e) {
-				// do nothing
-			}
-		});
-		return button;
-	}
-
-	private void addClearEntryButton(Composite container) {
-		createCalculatorButton(container, Commands.CLEAR_ENTRY, "CE", "Clear Entry");
-	}
-
-	private void addClearAllButton(Composite container) {
-		createCalculatorButton(container, Commands.CLEAR, "C", "Clear All");
-	}
-
-	private void addMemoryManagementButtons(Composite container) {
-		addSaveToMemoryButton(container);
-		addClearMemoryButton(container);
-		addAddValueToMemoryButton(container);
-		addSubstractFromMemoryButton(container);
-		addRecalMemoryValueButton(container);
-		addSeparator(container);
-	}
-
-	private void addSubstractFromMemoryButton(Composite container) {
-		createCalculatorButton(container, Commands.MEMORY_SUBSTRACT, "M-", "Subtract value from Memory");
-
-	}
-
-	private void addRecalMemoryValueButton(Composite container) {
-		createCalculatorButton(container, Commands.MEMORY_RECALL, "MR", "Recall value in Memory");
-	}
-
-	private void addAddValueToMemoryButton(Composite container) {
-		createCalculatorButton(container, Commands.MEMORY_ADD, "M+", "Add value to Memory");
-
-	}
-
-	private void addClearMemoryButton(Composite container) {
-		createCalculatorButton(container, Commands.MEMORY_CLEAR, "MC", "Clear Memory");
-
-	}
-
-	private void addSaveToMemoryButton(Composite container) {
-		createCalculatorButton(container, Commands.MEMORY_SAVE, "MS", "Save value to Memory");
-
+		GridData layoutData = new GridData(SWT.FILL, SWT.TOP, true, false, 5, 1);
+		layoutData.heightHint = 200;
+		historyView.setEditable(false);
+		historyView.setLayoutData(layoutData);
 	}
 
 	private void addMainMenu(final Shell parent) {
@@ -392,14 +111,14 @@ public class Calculator {
 		fileExitItem.addSelectionListener(new SelectionListener() {
 
 			@Override
-			public void widgetSelected(SelectionEvent e) {
-				parent.dispose();
-			}
-
-			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
 				parent.dispose();
 
+			}
+
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				parent.dispose();
 			}
 		});
 
@@ -415,20 +134,164 @@ public class Calculator {
 		parent.setMenuBar(menuBar);
 	}
 
+	private void addMemoryLabel(Composite container) {
+		memoryLabel = new Label(container, SWT.LEFT | SWT.NONE);
+
+		memoryLabel.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false, 5, 1));
+		updateMemoryLabel("");
+	}
+
+	private void addMemoryManagementButtons(Composite container) {
+		createCalculatorButton(container, new MemorySave("MS", "Save value to Memory"));
+		createCalculatorButton(container, new MemoryClear("MC", "Clear Memory"));
+		createCalculatorButton(container, new MemoryAdd("M+", "Add value to Memory"));
+		createCalculatorButton(container, new MemorySubstract("M-", "Subtract value from Memory"));
+		createCalculatorButton(container, new MemoryRecall("MR", "Recall value in Memory"));
+		addSeparator(container);
+	}
+
+	private void addNumPadButtons(Composite container) {
+		createCalculatorButton(container, new Digits("7", "Numeric Pad"));
+		createCalculatorButton(container, new Digits("8", "Numeric Pad"));
+		createCalculatorButton(container, new Digits("9", "Numeric Pad"));
+		createCalculatorButton(container, new Multiplication("*", "Multiplication"));
+		createCalculatorButton(container, new Division("/", "Division"));
+
+		createCalculatorButton(container, new Digits("4", "Numeric Pad"));
+		createCalculatorButton(container, new Digits("5", "Numeric Pad"));
+		createCalculatorButton(container, new Digits("6", "Numeric Pad"));
+		createCalculatorButton(container, new Addition("+", "Addition"));
+		createCalculatorButton(container, new Substraction("-", "Substraction"));
+
+		createCalculatorButton(container, new Digits("1", "Numeric Pad"));
+		createCalculatorButton(container, new Digits("2", "Numeric Pad"));
+		createCalculatorButton(container, new Digits("3", "Numeric Pad"));
+		addEmptyPlaceholder(container);
+		Label equalsButton = createCalculatorButton(container, new Equals("=", "Equals (get result)"));
+		equalsButton.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 1, 2));
+
+		createCalculatorButton(container, new Zero("0", "Numeric Pad"));
+		createCalculatorButton(container, new DecimalPoint(".", "Decimal Point"));
+		createCalculatorButton(container, new ChangeSign("+/-", "Change sign of value"));
+	}
+
+	private void addSeparator(Composite container) {
+		Label separator = new Label(container, SWT.HORIZONTAL | SWT.SEPARATOR);
+		separator.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false, 5, 1));
+	}
+
+	private void addStatusBar(Composite container) {
+		statusText = new Label(container, SWT.RIGHT | SWT.NONE);
+		statusText.setText("");
+		registerToolTips(container);
+		
+		statusText.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false, 5, 1));
+	}
+
+	private void registerToolTips(Composite container) {
+
+		for (Control child : buttons) {
+			if (child instanceof Label) {
+				final Label component = (Label) child;
+				if (component.getToolTipText() == null) {
+					continue;
+				}
+				final Label tipTarget = statusText;
+				component.addMouseTrackListener(new MouseTrackListener() {
+
+					@Override
+					public void mouseEnter(MouseEvent e) {
+						tipTarget.setText("[" + component.getText() + "] " + component.getToolTipText());
+					}
+
+					@Override
+					public void mouseExit(MouseEvent e) {
+						tipTarget.setText("");
+					}
+
+					@Override
+					public void mouseHover(MouseEvent e) {
+						// do nothing
+					}
+				});
+			}
+		}
+	}
+
+	public void appendHistoryEntry(String toAppend) {
+		historyView.append(toAppend);
+	}
+
+	public void applyBackspaceToHistory() {
+		String currentHistory = historyView.getText();
+		if (currentHistory.length() < 1) {
+			return;
+		}
+		String newHistory = currentHistory.substring(0, currentHistory.length() - 1);
+		historyView.setText(newHistory);
+	}
+
+	public void clearHistory() {
+		historyView.setText("");
+	}
+
+	private Label createCalculatorButton(Composite container, final AbstractCommand command) {
+		Label button = new Label(container, SWT.NONE | SWT.FLAT | SWT.CENTER);
+		buttons.add(button);
+
+		Font font = new Font(Display.getCurrent(), "Arial", 14, SWT.NONE);
+		button.setFont(font);
+
+		GridData buttonLayoutData = new GridData(SWT.FILL, SWT.FILL, true, true);
+		buttonLayoutData.widthHint = 40;
+		buttonLayoutData.heightHint = 30;
+		buttonLayoutData.verticalAlignment = GridData.VERTICAL_ALIGN_CENTER;
+		button.setLayoutData(buttonLayoutData);
+		button.setToolTipText(command.getButtonToolTip());
+		button.setText(command.getButtonLabel());
+
+		button.addMouseListener(new MouseListener() {
+
+			@Override
+			public void mouseDoubleClick(MouseEvent e) {
+				// do nothing
+			}
+
+			@Override
+			public void mouseDown(MouseEvent e) {
+				// do nothing
+			}
+
+			@Override
+			public void mouseUp(MouseEvent e) {
+				calculatorEngine.evaluateCommand(command);
+			}
+		});
+		return button;
+	}
+
+	protected Control createMainContents(final Shell container) {
+
+		addMainMenu(container);
+		initUiGrid(container);
+
+		initCalculatorDisplay(container);
+		addMemoryLabel(container);
+		addCalculatorButtons(container);
+		addSeparator(container);
+		addHistoryView(container);
+
+		return container;
+	}
+
 	private void initCalculatorDisplay(Composite container) {
 		displayText = new Label(container, SWT.RIGHT | SWT.BORDER);
 
 		Font font = new Font(Display.getCurrent(), "Monospaced", 20, SWT.NONE);
 		displayText.setFont(font);
 
-		displayText.setBackground(getSystemColor(SWT.COLOR_RED));
-		displayText.setForeground(getSystemColor(SWT.COLOR_YELLOW));
 		displayText.setText("0");
 		displayText.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false, 5, 1));
-	}
-
-	private Color getSystemColor(int colorConstant) {
-		return Display.getCurrent().getSystemColor(colorConstant);
 	}
 
 	private void initUiGrid(final Composite parent) {
@@ -446,21 +309,24 @@ public class Calculator {
 		parent.setLayout(calculatorGridLayout);
 	}
 
-	public void setText(String displayString) {
-		displayText.setText(displayString);
-	}
-
-	public void clearHistory() {
-		historyView.setText("");
-	}
-
-	public void applyBackspaceToHistory() {
-		String currentHistory = historyView.getText();
-		if (currentHistory.length() < 1) {
-			return;
+	private void open() {
+		Display display = new Display();
+		shell = new Shell(display, SWT.TITLE | SWT.CLOSE);
+		initContents();
+		styleProvider.applyStlying(this);
+		shell.pack();
+		shell.open();
+		while (!shell.isDisposed()) {
+			if (!display.readAndDispatch()) {
+				display.sleep();
+			}
 		}
-		String newHistory = currentHistory.substring(0, currentHistory.length() - 1);
-		historyView.setText(newHistory);
+		display.dispose();
+	}
+
+	private void initContents() {
+		createMainContents(shell);
+		addStatusBar(shell);
 	}
 
 	public void replaceLatestHistoryEntry(String toReplace, String replacement) {
@@ -472,6 +338,38 @@ public class Calculator {
 		String newHistory = currentHistory.substring(0, lastIndexOfToReplace);
 		newHistory += replacement;
 		historyView.setText(newHistory);
+	}
+
+	public void setText(String displayString) {
+		displayText.setText(displayString);
+	}
+
+	public void updateMemoryLabel(String memory) {
+		memoryLabel.setText("M: " + memory);
+	}
+
+	public Shell getMainControl() {
+		return shell;
+	}
+
+	public Control getMemory() {
+		return memoryLabel;
+	}
+
+	public Control getDisplay() {
+		return displayText;
+	}
+
+	public Control getStatus() {
+		return statusText;
+	}
+
+	public Control getHistory() {
+		return historyView;
+	}
+
+	public List<Control> geButtons() {
+		return buttons;
 	}
 
 }
