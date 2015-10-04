@@ -16,12 +16,10 @@ public class Digits extends AbstractCommand {
 	public void evaluate(Calculator calculator, CalculatorEngine calculatorEngine, String baseString) {
 		if (baseString.equals("0") || baseString.equals("-0")) {
 			baseString = "";
-			calculator.applyBackspaceToHistory();
 		}
 		if (baseString.length() < 29) {
 			String number = digit;
 			baseString = baseString + number;
-			calculator.appendHistoryEntry(number);
 		}
 		calculatorEngine.setClearDisplay(false);
 		calculatorEngine.updateCalculatorDisplay(baseString);

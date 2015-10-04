@@ -15,7 +15,5 @@ public class MemorySave extends AbstractCommand {
 		tempMemoryString = trimString(calculatorEngine.getDisplayString());
 		calculatorEngine.updateMemoryString(tempMemoryString);
 		calculatorEngine.setClearDisplay(true);
-		calculator.appendHistoryEntry(tempMemoryString + " > Memory\n");
-
 	}
 }

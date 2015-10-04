@@ -14,7 +14,6 @@ public class SquareRoot extends AbstractCommand {
 		baseString = doCalc(calculatorEngine.getDisplayString(), "");
 		calculatorEngine.setClearDisplay(true);
 		calculatorEngine.updateCalculatorDisplay(baseString);
-		calculator.appendHistoryEntry(" SQUARE ROOT \n = " + baseString);
 	}
 
 	@Override

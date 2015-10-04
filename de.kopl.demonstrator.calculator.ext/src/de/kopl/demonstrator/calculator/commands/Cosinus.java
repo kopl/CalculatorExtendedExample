@@ -14,7 +14,6 @@ public class Cosinus extends AbstractCommand {
 		baseString = doCalc(calculatorEngine.getDisplayString(), "");
 		calculatorEngine.setClearDisplay(true);
 		calculatorEngine.updateCalculatorDisplay(baseString);
-		calculator.appendHistoryEntry(" COS \n = " + baseString);
 	}
 	
 	@Override

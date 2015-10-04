@@ -15,7 +15,6 @@ public class BackSpace extends AbstractCommand {
 			baseString = "";
 		} else {
 			baseString = baseString.substring(0, baseString.length() - 1);
-			calculator.applyBackspaceToHistory();
 		}
 		calculatorEngine.setClearDisplay(false);
 		calculatorEngine.updateCalculatorDisplay(baseString);

@@ -16,8 +16,6 @@ public class Clear extends AbstractCommand {
 		calculatorEngine.setPendingCommand(null);
 		calculatorEngine.setClearDisplay(false);
 		calculatorEngine.updateCalculatorDisplay(baseString);
-		calculator.clearHistory();
-		calculator.appendHistoryEntry("0");
 	}
 
 }

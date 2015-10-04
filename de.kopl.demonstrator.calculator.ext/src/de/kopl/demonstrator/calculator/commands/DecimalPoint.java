@@ -13,7 +13,6 @@ public class DecimalPoint extends AbstractCommand {
 	public void evaluate(Calculator calculator, CalculatorEngine calculatorEngine, String baseString) {
 		if (baseString.indexOf(".") == -1 && baseString.length() < 29) {
 			baseString = baseString + ".";
-			calculator.appendHistoryEntry(".");
 		}
 		calculatorEngine.updateCalculatorDisplay(baseString);
 		calculatorEngine.setClearDisplay(false);

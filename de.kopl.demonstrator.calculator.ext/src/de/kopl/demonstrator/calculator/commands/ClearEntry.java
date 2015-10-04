@@ -15,8 +15,6 @@ public class ClearEntry extends AbstractCommand {
 		calculatorEngine.setClearDisplay(false);
 		calculatorEngine.updateCalculatorDisplay(baseString);
 		// FIXME this should only clear the latest entered display value, not the whole history
-		calculator.clearHistory();
-		calculator.appendHistoryEntry("0");
 	}
 
 }

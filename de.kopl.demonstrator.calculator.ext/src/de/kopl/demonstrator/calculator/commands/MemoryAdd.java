@@ -19,8 +19,6 @@ public class MemoryAdd extends AbstractCommand {
 		}
 		calculatorEngine.updateMemoryString(tempMemoryString);
 		calculatorEngine.setClearDisplay(true);
-		calculator.appendHistoryEntry("Memory + " + calculatorEngine.getDisplayString() + " = " + tempMemoryString
-				+ " > Memory\n");
 	}
 
 	

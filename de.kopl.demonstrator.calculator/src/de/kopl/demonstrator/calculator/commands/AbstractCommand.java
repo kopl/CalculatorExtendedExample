@@ -16,7 +16,7 @@ public abstract class AbstractCommand {
 
 	public abstract void evaluate(Calculator calculator, CalculatorEngine calculatorEngine, String baseString);
 
-	protected String trimLeadingMinusSign(String tempString) {
+	public String trimLeadingMinusSign(String tempString) {
 		return tempString.substring(1, tempString.length());
 	}
 

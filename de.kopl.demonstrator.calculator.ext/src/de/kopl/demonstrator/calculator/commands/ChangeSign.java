@@ -13,10 +13,8 @@ public class ChangeSign extends AbstractCommand {
 	public void evaluate(Calculator calculator, CalculatorEngine calculatorEngine, String baseString) {
 		if (baseString.startsWith("-")) {
 			baseString = trimLeadingMinusSign(baseString);
-			calculator.replaceLatestHistoryEntry("-" + baseString, baseString);
 		} else {
 			baseString = "-" + baseString;
-			calculator.replaceLatestHistoryEntry(trimLeadingMinusSign(baseString), baseString);
 		}
 		calculatorEngine.setClearDisplay(false);
 		calculatorEngine.updateCalculatorDisplay(baseString);

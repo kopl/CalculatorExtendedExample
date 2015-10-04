@@ -15,7 +15,6 @@ public class MemoryRecall extends AbstractCommand {
 		tempString = calculatorEngine.getMemoryString();
 		calculatorEngine.setClearDisplay(true);
 		calculatorEngine.updateCalculatorDisplay(tempString);
-		calculator.appendHistoryEntry("Memory > " + tempString + "\n");
 	}
 
 }

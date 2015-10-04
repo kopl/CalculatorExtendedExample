@@ -12,7 +12,6 @@ public class Division extends AbstractCommand {
 	@Override
 	public void evaluate(Calculator calculator, CalculatorEngine calculatorEngine, String baseString) {
 		updateCalc(calculator, calculatorEngine);
-		calculator.appendHistoryEntry("\n / ");
 		calculatorEngine.setClearDisplay(true);
 	}
 

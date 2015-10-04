@@ -14,7 +14,6 @@ public class Inverse extends AbstractCommand {
 		baseString = doCalc(calculatorEngine.getDisplayString(), "");
 		calculatorEngine.setClearDisplay(true);
 		calculatorEngine.updateCalculatorDisplay(baseString);
-		calculator.appendHistoryEntry(" INVERSE \n = " + baseString);
 	}
 
 	@Override

@@ -12,6 +12,6 @@ public class MemoryClear extends AbstractCommand {
 	@Override
 	public void evaluate(Calculator calculator, CalculatorEngine calculatorEngine, String baseString) {
 		calculatorEngine.updateMemoryString("");
-	}
+		}
 
 }

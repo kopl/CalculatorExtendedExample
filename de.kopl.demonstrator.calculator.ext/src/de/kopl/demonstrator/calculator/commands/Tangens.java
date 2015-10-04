@@ -14,7 +14,6 @@ public class Tangens extends AbstractCommand {
 		baseString = doCalc(calculatorEngine.getDisplayString(), "");
 		calculatorEngine.setClearDisplay(true);
 		calculatorEngine.updateCalculatorDisplay(baseString);
-		calculator.appendHistoryEntry(" TAN \n = " + baseString);
 	}
 
 	@Override

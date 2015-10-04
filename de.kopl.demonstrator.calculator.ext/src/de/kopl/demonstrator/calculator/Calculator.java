@@ -184,7 +184,7 @@ public class Calculator {
 		statusText = new Label(container, SWT.RIGHT | SWT.NONE);
 		statusText.setText("");
 		registerToolTips(container);
-		
+
 		statusText.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false, 5, 1));
 	}
 
@@ -265,9 +265,86 @@ public class Calculator {
 			@Override
 			public void mouseUp(MouseEvent e) {
 				calculatorEngine.evaluateCommand(command);
+				updateHistory(command);
 			}
+
 		});
 		return button;
+	}
+
+	private void updateHistory(AbstractCommand command) {
+		String currentDisplayString = calculatorEngine.getDisplayString();
+
+		if (command instanceof Clear || command instanceof ClearEntry) {
+			clearHistory();
+			appendHistoryEntry("0");
+			return;
+		}
+		if (command instanceof ChangeSign) {
+			if (currentDisplayString.startsWith("-")) {
+				currentDisplayString = command.trimLeadingMinusSign(currentDisplayString);
+				replaceLatestHistoryEntry("-" + currentDisplayString, currentDisplayString);
+			} else {
+				currentDisplayString = "-" + currentDisplayString;
+				replaceLatestHistoryEntry(command.trimLeadingMinusSign(currentDisplayString), currentDisplayString);
+			}
+			return;
+		}
+		if (command instanceof DecimalPoint) {
+			if (currentDisplayString.indexOf(".") == -1 && currentDisplayString.length() < 29) {
+				appendHistoryEntry(".");
+			}
+			return;
+		}
+
+		if (command instanceof BackSpace) {
+			if (currentDisplayString.length() >= 0) {
+				applyBackspaceToHistory();
+			}
+			return;
+		}
+
+		if (command instanceof Digits || command instanceof Zero) {
+			if (currentDisplayString.equals("0") || currentDisplayString.equals("-0")) {
+				applyBackspaceToHistory();
+			}
+			if (currentDisplayString.length() < 29) {
+				String number = command.getButtonLabel();
+				appendHistoryEntry(number);
+			}
+			return;
+		}
+		if (command instanceof MemoryAdd) {
+			appendHistoryEntry("\nMemory + " + calculatorEngine.getDisplayString() + " = "
+					+ calculatorEngine.getMemoryString() + " > Memory\n");
+			return;
+		}
+		if (command instanceof MemoryClear) {
+			appendHistoryEntry("\n_ > Memory\n");
+			return;
+		}
+		if (command instanceof MemoryRecall) {
+			appendHistoryEntry("\nMemory > " + calculatorEngine.getMemoryString() + "\n");
+			return;
+
+		}
+		if (command instanceof MemorySave) {
+			appendHistoryEntry("\n"+ calculatorEngine.getMemoryString() + " > Memory\n");
+			return;
+
+		}
+		if (command instanceof MemorySubstract) {
+			appendHistoryEntry("\nMemory - " + calculatorEngine.getDisplayString() + " = "
+					+ calculatorEngine.getMemoryString() + " > Memory\n");
+			return;
+		}
+		if (command instanceof Equals) {
+			appendHistoryEntry("\n= " + calculatorEngine.getDisplayString());
+			return;
+		}
+		appendHistoryEntry(" " + command.getButtonLabel() + " ");
+		return;
+
 	}
 
 	protected Control createMainContents(final Shell container) {

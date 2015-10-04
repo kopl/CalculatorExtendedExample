@@ -14,7 +14,6 @@ public class Sinus extends AbstractCommand {
 		baseString = doCalc(calculatorEngine.getDisplayString(), "");
 		calculatorEngine.setClearDisplay(true);
 		calculatorEngine.updateCalculatorDisplay(baseString);
-		calculator.appendHistoryEntry(" SIN \n = " + baseString);
 	}
 
 	@Override
