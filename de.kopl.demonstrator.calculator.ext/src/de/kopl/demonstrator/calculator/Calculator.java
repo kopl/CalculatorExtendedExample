@@ -5,22 +5,11 @@ import java.util.List;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
-import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseListener;
-import org.eclipse.swt.events.MouseTrackListener;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.events.*;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Caret;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
-import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.*;
 
 import de.kopl.demonstrator.calculator.commands.*;
 
@@ -59,7 +48,6 @@ public class Calculator {
 		addClearingButtons(container);
 		addMemoryManagementButtons(container);
 		addAdvancedMathButtons(container);
-		addNumPadButtons(container);
 	}
 
 	private void addAdvancedMathButtons(Composite container) {
@@ -86,8 +74,8 @@ public class Calculator {
 		new Label(container, SWT.NONE);
 	}
 
-	private void addHistoryView(Composite container) {
-		historyView = new StyledText(container, SWT.MULTI | SWT.WRAP | SWT.READ_ONLY);
+	private void addHistoryView(Composite container, StyledText historyView) {
+		this.historyView = new StyledText(container, SWT.MULTI | SWT.WRAP | SWT.READ_ONLY);
 
 		Caret caret = new Caret(historyView, SWT.NONE);
 		historyView.setCaret(caret);
@@ -180,16 +168,9 @@ public class Calculator {
 		separator.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false, 5, 1));
 	}
 
-	private void addStatusBar(Composite container) {
-		statusText = new Label(container, SWT.RIGHT | SWT.NONE);
-		statusText.setText("");
-		registerToolTips(container);
-
-		statusText.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false, 5, 1));
-	}
-
-	private void registerToolTips(Composite container) {
-
+	private void addStatusBar(Composite container, Label statusText) {
+		this.statusText = new Label(container, SWT.RIGHT | SWT.NONE);
+		this.statusText.setText("");
 		for (Control child : buttons) {
 			if (child instanceof Label) {
 				final Label component = (Label) child;
@@ -216,6 +197,8 @@ public class Calculator {
 				});
 			}
 		}
+
+		statusText.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false, 5, 1));
 	}
 
 	public void appendHistoryEntry(String toAppend) {
@@ -355,8 +338,9 @@ public class Calculator {
 		initCalculatorDisplay(container);
 		addMemoryLabel(container);
 		addCalculatorButtons(container);
+		addNumPadButtons(container);
 		addSeparator(container);
-		addHistoryView(container);
+		addHistoryView(container, historyView);
 
 		return container;
 	}
@@ -403,7 +387,7 @@ public class Calculator {
 
 	private void initContents() {
 		createMainContents(shell);
-		addStatusBar(shell);
+		addStatusBar(shell, statusText);
 	}
 
 	public void replaceLatestHistoryEntry(String toReplace, String replacement) {

@@ -4,20 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseListener;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.events.*;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
-import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.*;
 
 import de.kopl.demonstrator.calculator.commands.*;
 
@@ -51,7 +43,6 @@ public class Calculator {
 	private void addCalculatorButtons(Composite container) {
 		addClearingButtons(container);
 		addMemoryManagementButtons(container);
-		addNumPadButtons(container);
 	}
 
 	private void addClearingButtons(Composite container) {
@@ -194,6 +185,7 @@ public class Calculator {
 		initCalculatorDisplay(container);
 		addMemoryLabel(container);
 		addCalculatorButtons(container);
+		addNumPadButtons(container);
 		addSeparator(container);
 
 		return container;
