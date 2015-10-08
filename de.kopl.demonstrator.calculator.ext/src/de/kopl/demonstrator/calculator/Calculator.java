@@ -74,8 +74,8 @@ public class Calculator {
 		new Label(container, SWT.NONE);
 	}
 
-	private void addHistoryView(Composite container, StyledText historyView) {
-		this.historyView = new StyledText(container, SWT.MULTI | SWT.WRAP | SWT.READ_ONLY);
+	private void addHistoryView(Composite container) {
+		historyView = new StyledText(container, SWT.MULTI | SWT.WRAP | SWT.READ_ONLY);
 
 		Caret caret = new Caret(historyView, SWT.NONE);
 		historyView.setCaret(caret);
@@ -168,7 +168,7 @@ public class Calculator {
 		separator.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false, 5, 1));
 	}
 
-	private void addStatusBar(Composite container, Label statusText) {
+	private void addStatusBar(Composite container) {
 		this.statusText = new Label(container, SWT.RIGHT | SWT.NONE);
 		this.statusText.setText("");
 		for (Control child : buttons) {
@@ -340,7 +340,7 @@ public class Calculator {
 		addCalculatorButtons(container);
 		addNumPadButtons(container);
 		addSeparator(container);
-		addHistoryView(container, historyView);
+		addHistoryView(container);
 
 		return container;
 	}
@@ -387,7 +387,7 @@ public class Calculator {
 
 	private void initContents() {
 		createMainContents(shell);
-		addStatusBar(shell, statusText);
+		addStatusBar(shell);
 	}
 
 	public void replaceLatestHistoryEntry(String toReplace, String replacement) {
